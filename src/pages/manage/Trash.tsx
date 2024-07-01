@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
 import styles from "./Common.module.scss";
 import ListSearch from "../../components/ListSearch";
+import ListPage from "../../components/ListPage";
 import useLoadQuesListData from "../../hooks/useLoadQuesListData";
 import {
   Typography,
@@ -13,10 +14,9 @@ import {
   message,
   Spin
 } from "antd";
-import { title } from "process";
-import { render } from "@testing-library/react";
-import { useTitle } from "ahooks";
+import { useTitle, useRequest } from "ahooks";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { deleteQuestionService, updateQuestionService } from "../../sevices/question";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -25,11 +25,28 @@ const { confirm } = Modal;
 const Trash: FC = () => {
   useTitle("my问卷 - 回收站");
 
-  const { data = {}, loading } = useLoadQuesListData({ isDeleted: true })
+  const { data = {}, loading, refresh } = useLoadQuesListData({ isDeleted: true })
   const { list = [], total = 0 } = data
 
   // 记录选中的id
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // 恢复
+  const { run: recover } = useRequest(
+    async () => {
+      for await (const id of selectedIds) {
+        await updateQuestionService(id, { isDeleted: false })
+      }
+    }, {
+    manual: true,
+    debounceWait: 500, // 防抖
+    onSuccess() {
+      message.success('恢复成功')
+      refresh() // 手动刷新列表
+      setSelectedIds([])
+    }
+  }
+  )
 
   const tableColumns = [
     {
@@ -57,12 +74,25 @@ const Trash: FC = () => {
     },
   ];
 
+  //删除
+  const { run: deleteQuestion } = useRequest(
+    async () => await deleteQuestionService(selectedIds),
+    {
+      manual: true,
+      onSuccess() {
+        message.success('删除成功')
+        refresh()
+        setSelectedIds([])
+      }
+    }
+  )
+
   function del() {
     confirm({
       title: "确认删除？",
       icon: <ExclamationCircleOutlined />,
       content: "删除后不可以找回",
-      onOk: () => message.success("删除成功"),
+      onOk: deleteQuestion,
     });
   }
 
@@ -70,7 +100,7 @@ const Trash: FC = () => {
     <>
       <div style={{ marginBottom: "16px" }}>
         <Space>
-          <Button type="primary" disabled={selectedIds.length === 0}>
+          <Button type="primary" disabled={selectedIds.length === 0} onClick={recover}>
             恢复
           </Button>
           <Button
@@ -117,7 +147,9 @@ const Trash: FC = () => {
         )}
         {list.length > 0 && TableElem}
       </div>
-      <div className={styles.footer}>分页</div>
+      <div className={styles.footer}>
+        <ListPage total={total} />
+      </div>
     </>
   );
 };

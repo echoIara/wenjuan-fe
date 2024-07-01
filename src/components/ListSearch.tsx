@@ -1,4 +1,5 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Input } from "antd";
 import { LIST_SEARCH_PARAM_KEY } from "../constant";
@@ -20,7 +21,7 @@ const ListSearch: FC = () => {
   useEffect(() => {
     const newVal = searchParams.get(LIST_SEARCH_PARAM_KEY) || "";
     setValue(newVal);
-  });
+  }, [searchParams]);
 
   function handleSearch(value: string) {
     // 跳转页面
