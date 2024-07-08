@@ -26,7 +26,7 @@ const MainLayout: FC = () => {
       </Header>
       <Layout className={styles.main}>
         <Content >
-          {!waitingUserData ? <div style={{ textAlign: 'center', marginTop: '60px' }}>
+          {waitingUserData ? <div style={{ textAlign: 'center', marginTop: '60px' }}>
             <Spin />
           </div> : <Outlet />}
         </Content>
