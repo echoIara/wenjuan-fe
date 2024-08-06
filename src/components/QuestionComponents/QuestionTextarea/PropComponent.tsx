@@ -1,9 +1,9 @@
 import React, { FC, useEffect } from "react";
 import { Form, Input } from "antd";
-import { QuestionInputPropsType } from "./interface";
+import { QuestionTextareaPropsType } from "./interface";
 
-const PropComponent: FC<QuestionInputPropsType> = (
-  props: QuestionInputPropsType
+const PropComponent: FC<QuestionTextareaPropsType> = (
+  props: QuestionTextareaPropsType
 ) => {
   const { title, placeHolder, onChange, disabled } = props;
   const [form] = Form.useForm();
@@ -14,7 +14,7 @@ const PropComponent: FC<QuestionInputPropsType> = (
       title,
       placeHolder,
     });
-  }, [title, placeHolder]);
+  }, [title, placeHolder, form]);
 
   function handleValuesChange() {
     if (onChange) {

@@ -31,7 +31,9 @@ function useLoadQuesData() {
     let selectedId = "";
     selectedId = componentList.length > 0 ? componentList[0].fe_id : "";
 
-    dispatch(resetComponents({ componentList, selectedId }));
+    dispatch(
+      resetComponents({ componentList, selectedId, copiedComponent: null })
+    );
   }, [data]);
 
   // 判断 id 变化，执行 ajax 加载问卷数据

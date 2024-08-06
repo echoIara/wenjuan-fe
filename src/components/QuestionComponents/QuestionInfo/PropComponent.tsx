@@ -1,20 +1,21 @@
 import React, { FC, useEffect } from "react";
 import { Form, Input } from "antd";
-import { QuestionInputPropsType } from "./interface";
+import { QuestionInfoPropsType } from "./interface";
 
-const PropComponent: FC<QuestionInputPropsType> = (
-  props: QuestionInputPropsType
+const { TextArea } = Input;
+
+const PropComponent: FC<QuestionInfoPropsType> = (
+  props: QuestionInfoPropsType
 ) => {
-  const { title, placeHolder, onChange, disabled } = props;
+  const { title, desc, onChange, disabled } = props;
   const [form] = Form.useForm();
 
-  // 监听 title/placeHolder 的变化
   useEffect(() => {
     form.setFieldsValue({
       title,
-      placeHolder,
+      desc,
     });
-  }, [title, placeHolder]);
+  }, [title, desc, form]);
 
   function handleValuesChange() {
     if (onChange) {
@@ -25,10 +26,10 @@ const PropComponent: FC<QuestionInputPropsType> = (
   return (
     <Form
       layout="vertical"
-      onValuesChange={handleValuesChange}
-      initialValues={{ title, placeHolder }}
-      form={form}
+      initialValues={{ title, desc }}
       disabled={disabled}
+      onValuesChange={handleValuesChange}
+      form={form}
     >
       <Form.Item
         label="标题"
@@ -37,8 +38,8 @@ const PropComponent: FC<QuestionInputPropsType> = (
       >
         <Input />
       </Form.Item>
-      <Form.Item label="PlaceHolder" name="placeHolder">
-        <Input />
+      <Form.Item label="描述" name="desc">
+        <TextArea />
       </Form.Item>
     </Form>
   );

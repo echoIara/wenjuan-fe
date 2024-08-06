@@ -7,8 +7,9 @@ import {
   ComponentInfoType,
   changeSelectedId,
 } from "../../../store/componentsReducer";
-import styles from "./EditCanvas.module.scss";
+import useShortcutKey from "../../../hooks/useShortcutKey";
 import { Spin } from "antd";
+import styles from "./EditCanvas.module.scss";
 
 type PropsType = {
   loading: boolean;
@@ -33,6 +34,9 @@ const EditCanvas: FC<PropsType> = ({ loading }) => {
     dispatch(changeSelectedId(id));
   }
 
+  // 绑定快捷键
+  useShortcutKey()
+
   if (loading) {
     return (
       <div style={{ textAlign: "center", marginTop: "24px" }}>
@@ -42,27 +46,31 @@ const EditCanvas: FC<PropsType> = ({ loading }) => {
   }
   return (
     <div className={styles.canvas}>
-      {componentList.map((c) => {
-        const { fe_id } = c;
+      {componentList
+        .filter((c) => !c.isHidden)
+        .map((c) => {
+          const { fe_id, isLocked } = c;
 
-        // 拼接class name
-        const wrapperDefaultClassName = styles["component-wrapper"];
-        const selectClassName = styles.selected;
-        const wrapperClassName = classNames({
-          [wrapperDefaultClassName]: true,
-          [selectClassName]: selectedId === fe_id,
-        });
+          // 拼接class name
+          const wrapperDefaultClassName = styles["component-wrapper"];
+          const selectClassName = styles.selected;
+          const lockedClassName = styles.locked;
+          const wrapperClassName = classNames({
+            [wrapperDefaultClassName]: true,
+            [selectClassName]: selectedId === fe_id,
+            [lockedClassName]: isLocked,
+          });
 
-        return (
-          <div
-            key={fe_id}
-            className={wrapperClassName}
-            onClick={(e) => handleClick(e, fe_id)}
-          >
-            <div className={styles.component}>{getComponent(c)}</div>
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={fe_id}
+              className={wrapperClassName}
+              onClick={(e) => handleClick(e, fe_id)}
+            >
+              <div className={styles.component}>{getComponent(c)}</div>
+            </div>
+          );
+        })}
     </div>
   );
 };
