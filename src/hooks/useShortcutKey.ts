@@ -7,6 +7,7 @@ import {
   selectPrevComponent,
   selectNextComponent,
 } from "../store/componentsReducer";
+import { ActionCreators as UndoActionCreators } from "redux-undo";
 
 // 当前鼠标所在元素
 function isActiveElement() {
@@ -14,6 +15,8 @@ function isActiveElement() {
 
   // 光标没有 focus 到 input
   if (activeElement === document.body) return true;
+  // 增加 dnd-kit
+  if (activeElement?.matches('div[role="button"]')) return true;
 
   return false;
 }
@@ -50,7 +53,23 @@ function useShortcutKey() {
     dispatch(selectNextComponent());
   });
 
-  // TODO 撤销 重做
+  // 撤销
+  useKeyPress(
+    ["meta.z", "ctrl.z"],
+    () => {
+      if (!isActiveElement()) return;
+      dispatch(UndoActionCreators.undo());
+    },
+    {
+      exactMatch: true, // 严格匹配
+    }
+  );
+
+  // 重做
+  useKeyPress(["meta.shift.z", "ctrl.shift.z"], () => {
+    if (!isActiveElement()) return;
+    dispatch(UndoActionCreators.redo());
+  });
 }
 
 export default useShortcutKey;

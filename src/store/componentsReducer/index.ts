@@ -2,6 +2,7 @@
 import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 import { ComponentPropsType } from "../../components/QuestionComponents";
 import { produce } from "immer";
+import { arrayMove } from "@dnd-kit/sortable";
 import cloneDeep from "lodash.clonedeep";
 import { getNextSelectedId, insertComponent } from "./utils";
 
@@ -171,6 +172,34 @@ export const componentSlice = createSlice({
 
       draft.selectedId = componentList[index + 1].fe_id;
     }),
+
+    // 修改标题
+    changeComponentTitle: produce(
+      (
+        draft: ComponentStateType,
+        action: PayloadAction<{ fe_id: string; title: string }>
+      ) => {
+        const { fe_id, title } = action.payload;
+        const curComp = draft.componentList.find((c) => c.fe_id === fe_id);
+
+        if (curComp) {
+          curComp.title = title;
+        }
+      }
+    ),
+
+    // 移动组件位置
+    moveComponent: produce(
+      (
+        draft: ComponentStateType,
+        action: PayloadAction<{ oldIndex: number; newIndex: number }>
+      ) => {
+        const { componentList: curComp } = draft;
+        const { oldIndex, newIndex } = action.payload;
+
+        draft.componentList = arrayMove(curComp, oldIndex, newIndex);
+      }
+    ),
   },
 });
 
@@ -186,6 +215,8 @@ export const {
   pasteComponent,
   selectPrevComponent,
   selectNextComponent,
+  changeComponentTitle,
+  moveComponent,
 } = componentSlice.actions;
 
 export default componentSlice.reducer;

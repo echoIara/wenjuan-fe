@@ -1,33 +1,47 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Tabs } from "antd";
+import type { TabsProps } from "antd";
 import { FileTextOutlined, SettingOutlined } from "@ant-design/icons";
 import ComponentProp from "./ComponentProp";
+import PageSetting from "./PageSetting";
+import useGetComponentInfo from "../../../hooks/useGetComponentInfo";
+
+//枚举
+enum TabsKey {
+  Prop_key = "prop",
+  Setting_key = "setting",
+}
+const items: TabsProps["items"] = [
+  {
+    key: TabsKey.Prop_key,
+    label: <span>属性</span>,
+    icon: <FileTextOutlined />,
+    children: <ComponentProp />,
+  },
+  {
+    key: TabsKey.Setting_key,
+    label: <span>页面设置</span>,
+    icon: <SettingOutlined />,
+    children: <PageSetting />,
+  },
+];
 
 const RightPanel: FC = () => {
-  const tabsItems = [
-    {
-      key: "prop",
-      label: (
-        <span>
-          <FileTextOutlined />
-          属性
-        </span>
-      ),
-      children: <ComponentProp />,
-    },
-    {
-      key: "setting",
-      label: (
-        <span>
-          <SettingOutlined />
-          页面设置
-        </span>
-      ),
-      children: <div>页面设置</div>,
-    },
-  ];
+  const { selectedId } = useGetComponentInfo();
+  const [activeKey, setActiveKey] = useState<TabsKey>(TabsKey.Prop_key);
 
-  return <Tabs items={tabsItems} defaultActiveKey="prop"></Tabs>;
+  useEffect(() => {
+    if (selectedId) setActiveKey(TabsKey.Prop_key);
+    else setActiveKey(TabsKey.Setting_key);
+  }, [selectedId]);
+
+  return (
+    <Tabs
+      activeKey={activeKey}
+      onTabClick={(key) => setActiveKey(key as TabsKey)}
+      items={items}
+    />
+  );
 };
 
 export default RightPanel;
