@@ -4,6 +4,8 @@ import RightPanel from "./RightPanel";
 import useLoadQuesData from "../../../hooks/useLoadQuesData";
 import EditCanvas from "./EditCanvas";
 import { useDispatch } from "react-redux";
+import { useTitle } from "ahooks";
+import useGetPageInfo from "../../../hooks/useGetPageInfo";
 import { changeSelectedId } from "../../../store/componentsReducer";
 import styles from "./index.module.scss";
 import EditHeader from "./EditHeader";
@@ -16,6 +18,9 @@ const Edit: FC = () => {
   function clearSelected() {
     dispatch(changeSelectedId(""));
   }
+
+  const { title } = useGetPageInfo();
+  useTitle("编辑问卷" + title);
 
   return (
     <div className={styles.container}>

@@ -5,6 +5,7 @@
         "clonedeep",
         "downarrow",
         "immer",
+        "qrcode",
         "reduxjs",
         "uparrow"
     ]
